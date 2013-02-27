@@ -36,6 +36,28 @@ Or to move into a directory:
 
     fs.MoveToDirectory("fromFile.txt", @"aDirectory");
 
+## Find
+
+    var paths = fs.Find("directory");
+
+Will return the relative paths of all files and directories inside `directory`, including `directory`. E.g.
+
+    directory
+    directory\somefile.txt
+    direcotry\subdir
+    direcotry\subdir\anotherfile.txt
+
+Find returns a lazy enumeration, so it only finds stuff as you consume the enumeration. For example, if you
+were just looking for the first text file on your `C:\` drive:
+
+    var textFile = fs.Find(@"C:\").FirstOrDefault(path => path.EndsWith(".txt"));
+
+It won't go searching the rest of your `C:\` drive.
+
+Find also takes a predicate argument so you can tell it not to recurse into directories that you aren't interested in:
+
+    var paths = fs.Find("directory", dir => dir != ".git");
+
 ## Delete
 
     fs.Delete("file.txt");
