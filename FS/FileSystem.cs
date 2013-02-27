@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace FS
@@ -82,6 +83,29 @@ namespace FS
                 {
                     CopyDirectoryContents(originalFrom, subdir, Path.Combine(to, Path.GetFileName(subdir)),
                         copyFile);
+                }
+            }
+        }
+
+        public IEnumerable<string> Find(string path, Predicate<string> recurseIntoDirectory = null) {
+            recurseIntoDirectory = recurseIntoDirectory ?? (dir => true);
+            Stack<string> paths = new Stack<string>();
+
+            yield return path;
+            paths.Push(path);
+
+            while (paths.Count > 0) {
+                var currentPath = paths.Pop();
+
+                foreach (var dir in Directory.GetDirectories(currentPath)) {
+                    if (recurseIntoDirectory(dir)) {
+                        yield return dir;
+                        paths.Push(dir);
+                    }
+                }
+
+                foreach (var file in Directory.GetFiles(currentPath)) {
+                    yield return file;
                 }
             }
         }

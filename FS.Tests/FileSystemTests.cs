@@ -23,6 +23,8 @@ namespace FS.Tests
 
             new FileSystem().Copy("a", "b");
 
+            AssertFileContents(@"a\one.txt", @"contents of a\one.txt");
+            AssertFileContents(@"a\inner\two.txt", @"contents of a\inner\two.txt");
             AssertFileContents(@"b\one.txt", @"contents of a\one.txt");
             AssertFileContents(@"b\inner\two.txt", @"contents of a\inner\two.txt");
         }
@@ -44,6 +46,8 @@ namespace FS.Tests
 
             new FileSystem().Copy("a", "b", fn => Path.GetExtension(fn) != ".bad");
 
+            AssertFileContents(@"a\one.bad", @"contents of a\one.bad");
+            AssertFileContents(@"a\inner\two.txt", @"contents of a\inner\two.txt");
             AssertFileNotExtant(@"b\one.bad");
             AssertFileContents(@"b\inner\two.txt", @"contents of a\inner\two.txt");
         }
@@ -54,6 +58,7 @@ namespace FS.Tests
 
             new FileSystem().Copy(@"a\one.txt", @"b\one.txt");
 
+            AssertFileContents(@"a\one.txt", @"contents of a\one.txt");
             AssertFileContents(@"b\one.txt", @"contents of a\one.txt");
         }
 
@@ -83,6 +88,8 @@ namespace FS.Tests
             CreateFiles(@"a\one.txt");
 
             new FileSystem().CopyToDirectory(@"a\one.txt", "b");
+
+            AssertFileContents(@"a\one.txt", @"contents of a\one.txt");
             AssertFileContents(@"b\one.txt", @"contents of a\one.txt");
         }
 
@@ -91,6 +98,7 @@ namespace FS.Tests
             CreateFiles(@"a\one.txt");
 
             new FileSystem().MoveToDirectory(@"a\one.txt", "b");
+
             AssertFileNotExtant(@"a\one.txt");
             AssertFileContents(@"b\one.txt", @"contents of a\one.txt");
         }
@@ -102,6 +110,8 @@ namespace FS.Tests
 
             new FileSystem().CopyToDirectory("a", "b");
 
+            AssertFileContents(@"a\one.txt", @"contents of a\one.txt");
+            AssertFileContents(@"a\inner\two.txt", @"contents of a\inner\two.txt");
             AssertFileContents(@"b\a\one.txt", @"contents of a\one.txt");
             AssertFileContents(@"b\a\inner\two.txt", @"contents of a\inner\two.txt");
         }
@@ -141,6 +151,31 @@ namespace FS.Tests
             new FileSystem().Delete(@"a\one.txt");
 
             AssertFileNotExtant(@"a\one.txt");
+        }
+
+        [Test]
+        public void CanEnumerateAllFilesInADirectory() {
+            CreateFiles(@"a\one.txt", @"a\b\two.txt");
+            var paths = new FileSystem().Find("a");
+
+            Assert.That(paths, Is.EquivalentTo(new [] {"a", @"a\one.txt", @"a\b", @"a\b\two.txt"}));
+        }
+
+        [Test]
+        public void CanEnumerateAllFilesInADirectoryButWontRecurseIntoDirectory() {
+            CreateFiles(@"a\one.txt", @"a\b\two.txt");
+            var paths = new FileSystem().Find("a", dir => @"a\b" != dir);
+
+            Assert.That(paths, Is.EquivalentTo(new [] {"a", @"a\one.txt"}));
+        }
+
+        [Test]
+        public void FindIsLazy() {
+            CreateFiles(@"a\one.txt", @"a\b\two.txt");
+            new FileSystem().Find("a", dir => {
+                Assert.Fail("this shouldn't be called because we haven't accessed the enumeration yet!");
+                return true;
+            });
         }
 
         private static void AssertFileNotExtant(string path) {
