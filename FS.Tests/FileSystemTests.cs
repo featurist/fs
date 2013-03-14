@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Linq;
 using NUnit.Framework;
 
 namespace FS.Tests

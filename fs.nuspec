@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>FS</id>
+    <version>0.0.3</version>
+    <authors>Tim Macfarlane</authors>
+    <owners>Tim Macfarlane</owners>
+    <projectUrl>https://github.com/featurist/fs</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>some simple operations for the filesystem: copy, move, delete and create.</description>
+    <copyright>Copyright 2013</copyright>
+    <tags>filesystem</tags>
+  </metadata>
+  <files>
+    <file src="FS\bin\Debug\FS.dll" target="lib\net40" />
+    <file src="FS\bin\Debug\FS.pdb" target="lib\net40" />
+  </files>
+</package>
